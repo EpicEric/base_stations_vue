@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <v-toolbar app>
         Header
-    </div>
+    </v-toolbar>
 </template>
