@@ -2,7 +2,7 @@
   <div>
     <MapSidebar></MapSidebar>
     <v-content>
-      <v-container fluid>
+      <v-container>
         <div id="map"></div>
       </v-container>
     </v-content>
@@ -29,5 +29,5 @@ export default {
 }
 </script>
 <style>
-#map {height: 1000px; }
+#map {height: 1000px; z-index: 0}
 </style>
