@@ -14,7 +14,9 @@ import {
   VForm,
   VTextField,
   VDivider,
-  VSubheader
+  VSubheader,
+  VExpansionPanel,
+  VSelect
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
 
@@ -33,6 +35,8 @@ Vue.use(Vuetify, {
     VForm,
     VTextField,
     VDivider,
-    VSubheader
+    VSubheader,
+    VExpansionPanel,
+    VSelect
   }
 })
