@@ -1,8 +1,7 @@
 <template>
-    <v-navigation-drawer
+    <v-navigation-drawer dark
       fixed
       clipped
-      class="grey lighten-4"
       app
       v-model="drawer"
     >
@@ -14,7 +13,7 @@
                 <v-list-tile-title>Filtros</v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <v-list-tile @click="showOptions('operators')">
+            <v-list-tile @click="swapShowOptions('operator')">
               <v-list-tile-content>
                 <v-list-tile-title>Operadora</v-list-tile-title>
               </v-list-tile-content>
@@ -22,16 +21,14 @@
                 <v-icon></v-icon>
               </v-list-tile-action>
             </v-list-tile>
-            <div class="ml-3" v-if="showOperatorsOptions">
+            <div class="ml-3" v-if="showOptions['operator']">
               <v-select
               v-model="value"
               :items="operators"
-              label="Operadoras"
-              multiple
             ></v-select>
           </div>
           
-            <v-list-tile @click="showOptions('technology')">
+            <v-list-tile @click="swapShowOptions('technology')">
               <v-list-tile-content>
                 <v-list-tile-title>Tecnologia</v-list-tile-title>
               </v-list-tile-content>
@@ -39,15 +36,13 @@
                 <v-icon></v-icon>
               </v-list-tile-action>
             </v-list-tile>
-            <div class="ml-3" v-if="showTechnologiesOptions">
+            <div class="ml-3" v-if="showOptions['technology']">
               <v-select
               v-model="value"
               :items="technologies"
-              label="Tecnologias"
-              multiple
             ></v-select>
           </div>
-            <v-list-tile>
+            <v-list-tile @click="swapShowOptions('locality')">
               <v-list-tile-content>
                 <v-list-tile-title>Localidade</v-list-tile-title>
               </v-list-tile-content>
@@ -55,8 +50,32 @@
                 <v-icon></v-icon>
               </v-list-tile-action>
             </v-list-tile>
-            
-          
+           <template v-if="showOptions['locality']">
+            <v-list-tile class="ml-3">
+                <v-list-tile-content>
+                  <v-list-tile-title>Seleção retangular</v-list-tile-title>
+                </v-list-tile-content>
+                <v-list-tile-action>
+                  <v-icon></v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+              <v-list-tile class="ml-3">
+                <v-list-tile-content>
+                  <v-list-tile-title>Seleção circular</v-list-tile-title>
+                </v-list-tile-content>
+                <v-list-tile-action>
+                  <v-icon></v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+              <v-list-tile class="ml-3">
+                <v-list-tile-content>
+                  <v-list-tile-title>Seleção por cidade</v-list-tile-title>
+                </v-list-tile-content>
+                <v-list-tile-action>
+                  <v-icon></v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+          </template>
           </v-list-group>
           <v-list-group
             v-for="item in items"
@@ -93,8 +112,7 @@
   export default {
     data () {
       return {
-        showTechnologiesOptions: false,
-        showOperatorsOptions: false,
+        showOptions: {'technology': false, 'operator': false, 'locality': false},
         items: [
           {
             action: 'send',
@@ -123,13 +141,16 @@
       }
     },
     methods: {
-      showOptions(option) {
+      swapShowOptions(option) {
         switch(option) {
           case 'technology':
-            this.showTechnologiesOptions = !this.showTechnologiesOptions
+            this.showOptions['technology'] = !this.showOptions['technology']
             break
-          case 'operators':
-            this.showOperatorsOptions = !this.showOperatorsOptions
+          case 'operator':
+            this.showOptions['operator'] = !this.showOptions['operator']
+            break
+          case 'locality':
+            this.showOptions['locality'] = !this.showOptions['locality']
             break
         }
       }

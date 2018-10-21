@@ -2,9 +2,8 @@
   <div>
     <MapSidebar></MapSidebar>
     <v-content>
-      <v-container>
         <div id="map"></div>
-      </v-container>
+
     </v-content>
   </div>
 </template>
