@@ -51,7 +51,8 @@
               </v-list-tile-action>
             </v-list-tile>
            <template v-if="showOptions['locality']">
-            <v-list-tile class="ml-3">
+           <div class="ml-3">
+            <v-list-tile >
                 <v-list-tile-content>
                   <v-list-tile-title>Seleção retangular</v-list-tile-title>
                 </v-list-tile-content>
@@ -59,7 +60,7 @@
                   <v-icon></v-icon>
                 </v-list-tile-action>
               </v-list-tile>
-              <v-list-tile class="ml-3">
+              <v-list-tile>
                 <v-list-tile-content>
                   <v-list-tile-title>Seleção circular</v-list-tile-title>
                 </v-list-tile-content>
@@ -67,14 +68,26 @@
                   <v-icon></v-icon>
                 </v-list-tile-action>
               </v-list-tile>
-              <v-list-tile class="ml-3">
-                <v-list-tile-content>
+              <v-list-tile @click="swapShowOptions('cities')">
+                <v-list-tile-content >
                   <v-list-tile-title>Seleção por cidade</v-list-tile-title>
                 </v-list-tile-content>
                 <v-list-tile-action>
                   <v-icon></v-icon>
                 </v-list-tile-action>
               </v-list-tile>
+              <div class="ml-3 mb-3" v-if="showOptions['cities']">
+              <v-select
+              v-model="value"
+              :items="states"
+              label="Estado"
+            ></v-select>
+              <v-select
+              v-model="value"
+              :items="cities"
+              label="Cidade"
+            ></v-select>
+            </div></div>
           </template>
           </v-list-group>
           <v-list-group
@@ -112,7 +125,7 @@
   export default {
     data () {
       return {
-        showOptions: {'technology': false, 'operator': false, 'locality': false},
+        showOptions: {'technology': false, 'operator': false, 'locality': false, 'cities': false},
         items: [
           {
             action: 'send',
@@ -137,6 +150,10 @@
         ],
         states: [
           'SP'
+        ],
+        cities: [
+          'São Paulo',
+          'Guarulhos'
         ]
       }
     },
@@ -152,6 +169,10 @@
           case 'locality':
             this.showOptions['locality'] = !this.showOptions['locality']
             break
+          case 'cities':
+            this.showOptions['cities'] = !this.showOptions['cities']
+            break
+
         }
       }
     }
