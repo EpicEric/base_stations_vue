@@ -11,7 +11,7 @@
             <v-text-field prepend-icon="person" v-model="email" name="Email" label="Email"></v-text-field>
             <v-text-field prepend-icon="lock" v-model="password" name="Senha" label="Senha" type="password"></v-text-field>
             <v-card-actions>
-              <v-btn primary large block @click="login">Loginsss</v-btn>
+              <v-btn primary large block @click="login">Login</v-btn>
             </v-card-actions>
             </v-form>
           </v-card>
@@ -21,22 +21,30 @@
   </v-container>
 </template>
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
-  data() {
+  data () {
     return {
-      email: "",
-      password: ""
+      email: '',
+      password: ''
     }
+  },
+  computed: {
+    ...mapGetters([
+      'isAuthenticated'
+    ])
   },
   methods: {
     ...mapActions([
       'loginAction'
     ]),
-    async login() {
-      this.loginAction({username: this.email, password: this.password})
-    },
+    async login () {
+      await this.loginAction({username: this.email, password: this.password})
+      if (this.isAuthenticated) {
+        this.$router.push('mapa')
+      }
+    }
   }
 }
 </script>

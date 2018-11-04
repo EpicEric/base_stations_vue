@@ -13,6 +13,11 @@ export default new Vuex.Store({
       state.authToken = newToken
     }
   },
+  getters: {
+    isAuthenticated ({authToken}) {
+      return authToken != null
+    }
+  },
   actions: {
     async loginAction ({commit}, {username, password}) {
       try {
