@@ -8,10 +8,10 @@
               <h4>Login</h4>
             </v-card-title>
             <v-form>
-            <v-text-field prepend-icon="person" name="Email" label="Email"></v-text-field>
-            <v-text-field prepend-icon="lock" name="Senha" label="Senha" type="password"></v-text-field>
+            <v-text-field prepend-icon="person" v-model="email" name="Email" label="Email"></v-text-field>
+            <v-text-field prepend-icon="lock" v-model="password" name="Senha" label="Senha" type="password"></v-text-field>
             <v-card-actions>
-              <v-btn primary large block>Login</v-btn>
+              <v-btn primary large block @click="login">Loginsss</v-btn>
             </v-card-actions>
             </v-form>
           </v-card>
@@ -20,3 +20,23 @@
     </v-layout>
   </v-container>
 </template>
+<script>
+import { mapActions } from 'vuex'
+
+export default {
+  data() {
+    return {
+      email: "",
+      password: ""
+    }
+  },
+  methods: {
+    ...mapActions([
+      'loginAction'
+    ]),
+    async login() {
+      this.loginAction({username: this.email, password: this.password})
+    },
+  }
+}
+</script>
