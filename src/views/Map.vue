@@ -10,9 +10,17 @@
 
 <script>
 import MapSidebar from '@/components/MapSidebar'
+import {HTTP} from '@/api/api.js'
+
 export default {
   components: {
     MapSidebar
+  },
+  data () {
+    return {
+      map: null,
+      clusterURL: null
+    }    
   },
   beforeCreate () {
     if (!this.$store.getters.isAuthenticated) {
@@ -20,17 +28,153 @@ export default {
     }
   },
   mounted () {
-    var map = L.map('map').setView([51.505, -0.09], 13)
+    this.map = L.map('map')
+    this.map.on('moveend', this.moveendHandler())    
+    this.initMap()
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map)
+    }).addTo(this.map)
 
-    L.marker([51.5, -0.09]).addTo(map)
+    L.marker([51.5, -0.09]).addTo(this.map)
       .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
       .openPopup()
+  },
+  methods: {
+    async initMap () {
+      try {
+        const response = await HTTP({
+          url: '/api/map_info/',
+          method: 'GET',
+          headers: {
+            'Authorization': 'Token ' + this.$store.state.authToken
+          }
+        })
+        this.map.setView(response.data.location, 17)
+        this.clusterURL = response.data.cluster_url
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    moveendHandler (e) {
+      this.map.fetchID = (this.map.fetchID % 9007199254740991) + 1;
+      this.clearMarkerLayers();
+      this.map.markerClusterGroup = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        iconCreateFunction: this.iconCreateFunction,
+      });
+      this.map.markerClusterGroup.removeOnPan = true
+      this.map.markerClusterGroup.fetchID = this.map.fetchID
+      var zoom = this.map.getZoom()
+      var bbox = this.map.getBounds().toBBoxString()
+      var operator = "null" // FIXME
+      var baseURL = this.clusterURL.replace(/\{\{zoom\}\}/, zoom).replace(/\{\{bbox\}\}/, bbox).replace(/\{\{operator\}\}/, operator)
+      this.fetchClusters(baseURL, this.map.fetchID)
+    },
+    clearMarkerLayers () {
+      this.map.eachLayer(function(layer) {
+        if (layer.removeOnPan && layer.fetchID != this.map.fetchID) {
+          this.map.removeLayer(layer)
+        }
+      })
+    },
+    fetchClusters (url, id) {
+      // After changing pan/zoom, stop fetching from previous screen
+      if (this.map.fetchID == id) {
+        fetch(url).then(function(resp) {
+          // Convert to GeoJSON
+          return resp.json()
+        }).then(function(data) {
+          // Try next page of API
+          var promise = new Promise(function (resolve, reject) {
+            var new_url = data['next']
+            if (new_url) {
+              this.fetchClusters(new_url, id)
+            } else {
+              this.map.addLayer(this.map.markerClusterGroup)
+              this.map.spin(false)
+            }
+            resolve()
+          })
+          // Iterate over every feature and add to map
+          layer = L.featureGroup.subGroup(this.map.markerClusterGroup)
+          L.geoJson(data, {
+            onEachFeature: function onEachFeature(feature, marker) {
+              var props = feature.properties
+              marker.count = props.count
+              // If it is not a cluster, add text data to marker
+              if (props.count == 1) {
+                marker.bindTooltip(`${props.data}`)
+              } else {
+                marker.setIcon(this.iconCreateFunction(marker))
+                marker.on('click', function(e) {
+                  map.setView(e.latlng, map.getZoom() + 1)
+                })
+              }
+            },
+          }).addTo(layer)
+          layer.removeOnPan = true
+          layer.fetchID = id
+          clearMarkerLayers()
+          if (id == this.map.fetchID) {
+            this.map.addLayer(layer)
+          }
+          return promise
+        })
+      }
+    },
+    iconCreateFunction (cluster) {
+      var count = 0
+      if (cluster.getAllChildMarkers) { // markercluster plugin call
+        var children = cluster.getAllChildMarkers()
+        for (var i = 0; i < children.length; i++) {
+          if (children[i].count) {
+            count += children[i].count
+          } else {
+            count++
+          }
+        }
+      } else if (cluster.count) { // custom call
+        count = cluster.count
+      }
+      if (count == 1) { // actual marker
+        return new L.Icon.Default()
+      }
+      // cluster icon
+      var c = 'marker-cluster-'
+      if (count < 100) {
+        c += 'small'
+      } else if (count < 1000) {
+        c += 'medium'
+      } else {
+        c += 'large'
+      }
+      return new L.DivIcon({
+        html: '<div><span>' + this.getTextFromCount(count) + '</span></div>',
+        className: 'marker-cluster ' + c,
+        iconSize: new L.Point(40, 40)
+      })
+    },
+    getTextFromCount (count) {
+      var suffix = ['', 'k', 'M']
+      var suffixIndex = 0
+      if (count > 10000) {
+        while (count > 1000) {
+          count /= 1000
+          suffixIndex++
+        }
+      }
+      if (count > 100) {
+        return Math.round(count) + suffix[suffixIndex]
+      }
+      if (count > 10) {
+        return (Math.round(count * 10) / 10) + suffix[suffixIndex]
+      }
+      return (Math.round(count * 100) / 100) + suffix[suffixIndex]
+    }
   }
 }
+
 </script>
 <style>
 #map {height: 1000px; z-index: 0}
