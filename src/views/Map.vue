@@ -27,18 +27,17 @@ export default {
       this.$router.push('login')
     }
   },
-  mounted () {
+  async mounted () {
     this.map = L.map('map')
-    this.map.on('moveend', this.moveendHandler())    
-    this.initMap()
+    this.map.setMaxZoom(19);
+    this.map.fetchID = 0;
+    await this.initMap()
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map)
 
-    L.marker([51.5, -0.09]).addTo(this.map)
-      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-      .openPopup()
+    this.map.on('moveend', this.moveendHandler)
   },
   methods: {
     async initMap () {
@@ -72,7 +71,7 @@ export default {
       this.fetchClusters(baseURL, this.map.fetchID)
     },
     clearMarkerLayers () {
-      this.map.eachLayer(function(layer) {
+      this.map.eachLayer(function (layer) {
         if (layer.removeOnPan && layer.fetchID != this.map.fetchID) {
           this.map.removeLayer(layer)
         }
@@ -80,26 +79,32 @@ export default {
     },
     fetchClusters (url, id) {
       // After changing pan/zoom, stop fetching from previous screen
+      var map = this.map
       if (this.map.fetchID == id) {
-        fetch(url).then(function(resp) {
+        HTTP({
+          url: url,
+          method: 'GET',
+          headers: {
+            'Authorization': 'Token ' + this.$store.state.authToken
+          }
+        }).then(function (resp) {
           // Convert to GeoJSON
-          return resp.json()
-        }).then(function(data) {
+          return resp
+        }).then(function (data) {
           // Try next page of API
           var promise = new Promise(function (resolve, reject) {
             var new_url = data['next']
             if (new_url) {
               this.fetchClusters(new_url, id)
             } else {
-              this.map.addLayer(this.map.markerClusterGroup)
-              this.map.spin(false)
+              map.addLayer(map.markerClusterGroup)
             }
             resolve()
           })
           // Iterate over every feature and add to map
-          layer = L.featureGroup.subGroup(this.map.markerClusterGroup)
+          var layer = L.featureGroup.subGroup(map.markerClusterGroup)
           L.geoJson(data, {
-            onEachFeature: function onEachFeature(feature, marker) {
+            onEachFeature: function onEachFeature (feature, marker) {
               var props = feature.properties
               marker.count = props.count
               // If it is not a cluster, add text data to marker
@@ -107,15 +112,15 @@ export default {
                 marker.bindTooltip(`${props.data}`)
               } else {
                 marker.setIcon(this.iconCreateFunction(marker))
-                marker.on('click', function(e) {
-                  map.setView(e.latlng, map.getZoom() + 1)
+                marker.on('click', function (e) {
+                  this.map.setView(e.latlng, this.map.getZoom() + 1)
                 })
               }
-            },
+            }
           }).addTo(layer)
           layer.removeOnPan = true
           layer.fetchID = id
-          clearMarkerLayers()
+          this.clearMarkerLayers()
           if (id == this.map.fetchID) {
             this.map.addLayer(layer)
           }
