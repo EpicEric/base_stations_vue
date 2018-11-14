@@ -71,15 +71,17 @@ export default {
       this.fetchClusters(baseURL, this.map.fetchID)
     },
     clearMarkerLayers () {
+      var context = this
       this.map.eachLayer(function (layer) {
-        if (layer.removeOnPan && layer.fetchID != this.map.fetchID) {
-          this.map.removeLayer(layer)
+        if (layer.removeOnPan && layer.fetchID != context.map.fetchID) {
+          context.map.removeLayer(layer)
         }
       })
     },
     fetchClusters (url, id) {
       // After changing pan/zoom, stop fetching from previous screen
       var map = this.map
+      var context = this
       if (this.map.fetchID == id) {
         HTTP({
           url: url,
@@ -103,7 +105,7 @@ export default {
           })
           // Iterate over every feature and add to map
           var layer = L.featureGroup.subGroup(map.markerClusterGroup)
-          L.geoJson(data, {
+          L.geoJson(data['data'], {
             onEachFeature: function onEachFeature (feature, marker) {
               var props = feature.properties
               marker.count = props.count
@@ -111,18 +113,18 @@ export default {
               if (props.count == 1) {
                 marker.bindTooltip(`${props.data}`)
               } else {
-                marker.setIcon(this.iconCreateFunction(marker))
+                marker.setIcon(context.iconCreateFunction(marker))
                 marker.on('click', function (e) {
-                  this.map.setView(e.latlng, this.map.getZoom() + 1)
+                  context.map.setView(e.latlng, context.map.getZoom() + 1)
                 })
               }
             }
           }).addTo(layer)
           layer.removeOnPan = true
           layer.fetchID = id
-          this.clearMarkerLayers()
-          if (id == this.map.fetchID) {
-            this.map.addLayer(layer)
+          context.clearMarkerLayers()
+          if (id == context.map.fetchID) {
+            context.map.addLayer(layer)
           }
           return promise
         })
