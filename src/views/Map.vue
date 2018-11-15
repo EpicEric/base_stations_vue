@@ -10,7 +10,7 @@
 
 <script>
 import MapSidebar from '@/components/MapSidebar'
-import {HTTP} from '@/api/api.js'
+import { HTTP } from '@/api/api.js'
 
 export default {
   components: {
@@ -20,7 +20,7 @@ export default {
     return {
       map: null,
       clusterURL: null
-    }    
+    }
   },
   beforeCreate () {
     if (!this.$store.getters.isAuthenticated) {
@@ -29,8 +29,8 @@ export default {
   },
   async mounted () {
     this.map = L.map('map')
-    this.map.setMaxZoom(19);
-    this.map.fetchID = 0;
+    this.map.setMaxZoom(19)
+    this.map.fetchID = 0
     await this.initMap()
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -49,24 +49,25 @@ export default {
             'Authorization': 'Token ' + this.$store.state.authToken
           }
         })
-        this.map.setView(response.data.location, 17)
+        this.defaultLocation = response.data.location
+        this.map.setView(this.defaultLocation, 17)
         this.clusterURL = response.data.cluster_url
       } catch (err) {
         console.log(err)
       }
     },
     moveendHandler (e) {
-      this.map.fetchID = (this.map.fetchID % 9007199254740991) + 1;
-      this.clearMarkerLayers();
+      this.map.fetchID = (this.map.fetchID % 9007199254740991) + 1
+      this.clearMarkerLayers()
       this.map.markerClusterGroup = L.markerClusterGroup({
         showCoverageOnHover: false,
-        iconCreateFunction: this.iconCreateFunction,
-      });
+        iconCreateFunction: this.iconCreateFunction
+      })
       this.map.markerClusterGroup.removeOnPan = true
       this.map.markerClusterGroup.fetchID = this.map.fetchID
       var zoom = this.map.getZoom()
       var bbox = this.map.getBounds().toBBoxString()
-      var operator = "null" // FIXME
+      var operator = 'null' // FIXME: Get current operator ID
       var baseURL = this.clusterURL.replace(/\{\{zoom\}\}/, zoom).replace(/\{\{bbox\}\}/, bbox).replace(/\{\{operator\}\}/, operator)
       this.fetchClusters(baseURL, this.map.fetchID)
     },
@@ -78,56 +79,53 @@ export default {
         }
       })
     },
-    fetchClusters (url, id) {
+    async fetchClusters (url, id) {
       // After changing pan/zoom, stop fetching from previous screen
       var map = this.map
       var context = this
       if (this.map.fetchID == id) {
-        HTTP({
+        const response = await HTTP({
           url: url,
           method: 'GET',
           headers: {
             'Authorization': 'Token ' + this.$store.state.authToken
           }
-        }).then(function (resp) {
-          // Convert to GeoJSON
-          return resp
-        }).then(function (data) {
-          // Try next page of API
-          var promise = new Promise(function (resolve, reject) {
-            var new_url = data['next']
-            if (new_url) {
-              this.fetchClusters(new_url, id)
-            } else {
-              map.addLayer(map.markerClusterGroup)
-            }
-            resolve()
-          })
-          // Iterate over every feature and add to map
-          var layer = L.featureGroup.subGroup(map.markerClusterGroup)
-          L.geoJson(data['data'], {
-            onEachFeature: function onEachFeature (feature, marker) {
-              var props = feature.properties
-              marker.count = props.count
-              // If it is not a cluster, add text data to marker
-              if (props.count == 1) {
-                marker.bindTooltip(`${props.data}`)
-              } else {
-                marker.setIcon(context.iconCreateFunction(marker))
-                marker.on('click', function (e) {
-                  context.map.setView(e.latlng, context.map.getZoom() + 1)
-                })
-              }
-            }
-          }).addTo(layer)
-          layer.removeOnPan = true
-          layer.fetchID = id
-          context.clearMarkerLayers()
-          if (id == context.map.fetchID) {
-            context.map.addLayer(layer)
-          }
-          return promise
         })
+        var data = response.data
+        // Try next page of API
+        var promise = new Promise(function (resolve, reject) {
+          var new_url = data.next
+          if (new_url) {
+            context.fetchClusters(new_url, id)
+          } else {
+            map.addLayer(map.markerClusterGroup)
+          }
+          resolve()
+        })
+        // Iterate over every feature and add to map
+        var layer = L.featureGroup.subGroup(map.markerClusterGroup)
+        L.geoJson(data, {
+          onEachFeature: function onEachFeature (feature, marker) {
+            var props = feature.properties
+            marker.count = props.count
+            // If it is not a cluster, add text data to marker
+            if (props.count == 1) {
+              marker.bindTooltip(`${props.data}`)
+            } else {
+              marker.setIcon(context.iconCreateFunction(marker))
+              marker.on('click', function (e) {
+                context.map.setView(e.latlng, context.map.getZoom() + 1)
+              })
+            }
+          }
+        }).addTo(layer)
+        layer.removeOnPan = true
+        layer.fetchID = id
+        context.clearMarkerLayers()
+        if (id == context.map.fetchID) {
+          context.map.addLayer(layer)
+        }
+        return promise
       }
     },
     iconCreateFunction (cluster) {

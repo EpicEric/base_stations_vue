@@ -40,7 +40,7 @@ export default {
       'loginAction'
     ]),
     async login () {
-      await this.loginAction({username: this.email, password: this.password})
+      await this.loginAction({ username: this.email, password: this.password })
       if (this.isAuthenticated) {
         this.$router.push('mapa')
       }

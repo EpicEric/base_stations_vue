@@ -27,7 +27,7 @@
               :items="operators"
             ></v-select>
           </div>
-          
+
             <v-list-tile @click="swapShowOptions('technology')">
               <v-list-tile-content>
                 <v-list-tile-title>Tecnologia</v-list-tile-title>
@@ -122,59 +122,58 @@
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        showOptions: {'technology': false, 'operator': false, 'locality': false, 'cities': false},
-        items: [
-          {
-            action: 'send',
-            title: 'Encontrar ponto ótimo',
-            active: true,
-            items: []
-          },
-          {
-            action: 'school',
-            title: 'Mapa de calor',
-            items: []
-          },        
-        ],
-        technologies: [
-          '3G',
-          '4G'
-        ],
-        operators: [
-          'Claro',
-          'TIM',
-          'Vivo'
-        ],
-        states: [
-          'SP'
-        ],
-        cities: [
-          'São Paulo',
-          'Guarulhos'
-        ]
-      }
-    },
-    methods: {
-      swapShowOptions(option) {
-        switch(option) {
-          case 'technology':
-            this.showOptions['technology'] = !this.showOptions['technology']
-            break
-          case 'operator':
-            this.showOptions['operator'] = !this.showOptions['operator']
-            break
-          case 'locality':
-            this.showOptions['locality'] = !this.showOptions['locality']
-            break
-          case 'cities':
-            this.showOptions['cities'] = !this.showOptions['cities']
-            break
-
+export default {
+  data () {
+    return {
+      showOptions: { 'technology': false, 'operator': false, 'locality': false, 'cities': false },
+      items: [
+        {
+          action: 'send',
+          title: 'Encontrar ponto ótimo',
+          active: true,
+          items: []
+        },
+        {
+          action: 'school',
+          title: 'Mapa de calor',
+          items: []
         }
+      ],
+      technologies: [
+        '3G',
+        '4G'
+      ],
+      operators: [
+        'Claro',
+        'TIM',
+        'Vivo'
+      ],
+      states: [
+        'SP'
+      ],
+      cities: [
+        'São Paulo',
+        'Guarulhos'
+      ]
+    }
+  },
+  methods: {
+    swapShowOptions (option) {
+      switch (option) {
+        case 'technology':
+          this.showOptions['technology'] = !this.showOptions['technology']
+          break
+        case 'operator':
+          this.showOptions['operator'] = !this.showOptions['operator']
+          break
+        case 'locality':
+          this.showOptions['locality'] = !this.showOptions['locality']
+          break
+        case 'cities':
+          this.showOptions['cities'] = !this.showOptions['cities']
+          break
       }
     }
   }
+}
 </script>

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import {HTTP} from './api/api.js'
+import { HTTP } from './api/api.js'
 
 Vue.use(Vuex)
 export default new Vuex.Store({
@@ -14,12 +14,12 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    isAuthenticated ({authToken}) {
+    isAuthenticated ({ authToken }) {
       return authToken != null
     }
   },
   actions: {
-    async loginAction ({commit}, {username, password}) {
+    async loginAction ({ commit }, { username, password }) {
       try {
         const response = await HTTP.post('/api-token-auth/', {
           username: username,
