@@ -1,9 +1,8 @@
 <template>
   <div>
-    <MapSidebar></MapSidebar>
+    <MapSidebar @selectRectangle="selectRectangle" @selectCircle="selectCircle" ></MapSidebar>
     <v-content>
         <div id="map"></div>
-
     </v-content>
   </div>
 </template>
@@ -19,7 +18,9 @@ export default {
   data () {
     return {
       map: null,
-      clusterURL: null
+      clusterURL: null,
+      drawControl: null,
+      drawnItems: null
     }
   },
   beforeCreate () {
@@ -29,8 +30,17 @@ export default {
   },
   async mounted () {
     this.map = L.map('map')
+
+    this.drawnItems = new L.FeatureGroup();
+    this.map.addLayer(this.drawnItems);
+    this.drawControl = new L.Control.Draw({
+      edit: {
+        featureGroup: this.drawnItems
+      }
+    });
+
     this.map.setMaxZoom(19)
-    this.map.fetchID = 0
+    this.map.fetchID = 0  
     await this.initMap()
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -38,6 +48,10 @@ export default {
     }).addTo(this.map)
 
     this.map.on('moveend', this.moveendHandler)
+    // var bounds = [[-46.7302, -23.5572], [-46.7202, -23.5472]]
+    // var rectangle = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(this.map)
+    // rectangle.editing.enable()
+    // this.map.fitBounds(bounds)
   },
   methods: {
     async initMap () {
@@ -176,7 +190,29 @@ export default {
         return (Math.round(count * 10) / 10) + suffix[suffixIndex]
       }
       return (Math.round(count * 100) / 100) + suffix[suffixIndex]
-    }
+    },
+    selectRectangle () {
+      new L.Draw.Rectangle(this.map, this.drawControl.options.rectangle).enable()
+      this.map.on('draw:created', this.handleSelectRectangle)
+    },
+    handleSelectRectangle (e) {
+      var type = e.layerType
+      var layer = e.layer
+      alert(layer.getLatLngs())
+      this.drawnItems.addLayer(layer)
+    },
+
+    selectCircle () {
+      new L.Draw.Circle(this.map, this.drawControl.options.circle).enable()
+      this.map.on('draw:created', this.handleSelectCircle)
+    },
+    handleSelectCircle (e) {
+      console.log(e)
+      var type = e.layerType
+      var layer = e.layer
+      alert(layer.getLatLng() + "\nRadio:" + layer.getRadius())
+      this.drawnItems.addLayer(layer)
+    },
   }
 }
 

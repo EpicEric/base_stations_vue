@@ -52,7 +52,7 @@
             </v-list-tile>
            <template v-if="showOptions['locality']">
            <div class="ml-3">
-            <v-list-tile >
+            <v-list-tile @click="$emit('selectRectangle')" >
                 <v-list-tile-content>
                   <v-list-tile-title>Seleção retangular</v-list-tile-title>
                 </v-list-tile-content>
@@ -60,7 +60,7 @@
                   <v-icon></v-icon>
                 </v-list-tile-action>
               </v-list-tile>
-              <v-list-tile>
+              <v-list-tile @click="$emit('selectCircle')">
                 <v-list-tile-content>
                   <v-list-tile-title>Seleção circular</v-list-tile-title>
                 </v-list-tile-content>
@@ -105,9 +105,7 @@
 
             <v-list-tile
               v-for="subItem in item.items"
-              :key="subItem.title"
-              @click=""
-            >
+              :key="subItem.title">
               <v-list-tile-content>
                 <v-list-tile-title>{{ subItem.title }}</v-list-tile-title>
               </v-list-tile-content>
