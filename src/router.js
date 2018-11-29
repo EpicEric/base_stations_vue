@@ -8,7 +8,6 @@ import MapView from './views/Map.vue'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
   routes: [
     {
       path: '/',
