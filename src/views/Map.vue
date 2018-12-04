@@ -64,8 +64,33 @@ export default {
           }
         })
         this.defaultLocation = response.data.location
+        this.$store.state.selectedOperator = {}
         this.map.setView(this.defaultLocation, 17)
         this.clusterURL = response.data.cluster_url
+        this.operatorURL = response.data.operator_url
+        this.$store.state.operators = [{id: null, friendly_name: ""}]
+        this.$store.state.selectedOperator = this.$store.state.operators[0]
+        this.getOperatorData()
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async getOperatorData () {
+      try {
+        const response = await HTTP({
+          url: this.operatorURL,
+          method: 'GET',
+          headers: {
+            'Authorization': 'Token ' + this.$store.state.authToken
+          }
+        })
+        var fetchedOperators = response.data
+        fetchedOperators.sort(function(a, b) {
+          if (a.friendly_name > b.friendly_name) return 1;
+          if (a.friendly_name < b.friendly_name) return -1;
+          return 0;
+        })
+        this.$store.state.operators = this.$store.state.operators.concat(fetchedOperators)
       } catch (err) {
         console.log(err)
       }
@@ -81,7 +106,8 @@ export default {
       this.map.markerClusterGroup.fetchID = this.map.fetchID
       var zoom = this.map.getZoom()
       var bbox = this.map.getBounds().toBBoxString()
-      var operator = 'null' // FIXME: Get current operator ID
+      var operator = this.$store.state.selectedOperator.id ? this.$store.state.selectedOperator.id : null
+      console.log(this.$store.state.selectedOperator)
       var baseURL = this.clusterURL.replace(/\{\{zoom\}\}/, zoom).replace(/\{\{bbox\}\}/, bbox).replace(/\{\{operator\}\}/, operator)
       this.fetchClusters(baseURL, this.map.fetchID)
     },
@@ -92,6 +118,15 @@ export default {
           context.map.removeLayer(layer)
         }
       })
+    },
+    async continueFetch(new_url, id) {
+      var map = this.map
+      var context = this
+      if (new_url) {
+        context.fetchClusters(new_url, id)
+      } else {
+        map.addLayer(map.markerClusterGroup)
+      }
     },
     async fetchClusters (url, id) {
       // After changing pan/zoom, stop fetching from previous screen
@@ -107,15 +142,7 @@ export default {
         })
         var data = response.data
         // Try next page of API
-        var promise = new Promise(function (resolve, reject) {
-          var new_url = data.next
-          if (new_url) {
-            context.fetchClusters(new_url, id)
-          } else {
-            map.addLayer(map.markerClusterGroup)
-          }
-          resolve()
-        })
+        var promise = continueFetch(data.next, id)
         // Iterate over every feature and add to map
         var layer = L.featureGroup.subGroup(map.markerClusterGroup)
         L.geoJson(data, {

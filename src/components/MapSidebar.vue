@@ -23,9 +23,9 @@
             </v-list-tile>
             <div class="ml-3" v-if="showOptions['operator']">
               <v-select
-              v-model="value"
-              :items="operators"
-            ></v-select>
+                :items="operatorsToOptions()"
+                v-model="$store.state.selectedOperator"
+              ></v-select>
           </div>
 
             <v-list-tile @click="swapShowOptions('technology')">
@@ -38,9 +38,9 @@
             </v-list-tile>
             <div class="ml-3" v-if="showOptions['technology']">
               <v-select
-              v-model="value"
-              :items="technologies"
-            ></v-select>
+                v-model="value"
+                :items="technologies"
+              ></v-select>
           </div>
             <v-list-tile @click="swapShowOptions('locality')">
               <v-list-tile-content>
@@ -78,15 +78,15 @@
               </v-list-tile>
               <div class="ml-3 mb-3" v-if="showOptions['cities']">
               <v-select
-              v-model="value"
-              :items="states"
-              label="Estado"
-            ></v-select>
+                v-model="value"
+                :items="states"
+                label="Estado"
+              ></v-select>
               <v-select
-              v-model="value"
-              :items="cities"
-              label="Cidade"
-            ></v-select>
+                v-model="value"
+                :items="cities"
+                label="Cidade"
+              ></v-select>
             </div></div>
           </template>
           </v-list-group>
@@ -141,11 +141,6 @@ export default {
         '3G',
         '4G'
       ],
-      operators: [
-        'Claro',
-        'TIM',
-        'Vivo'
-      ],
       states: [
         'SP'
       ],
@@ -171,6 +166,15 @@ export default {
           this.showOptions['cities'] = !this.showOptions['cities']
           break
       }
+    },
+    operatorsToOptions() {
+      return this.$store.state.operators.map(function(operator) {
+        var newOperator = {toString: function() { return operator.friendly_name }}
+        for (var key in operator) {
+          newOperator[key] = operator[key]
+        }
+        return newOperator
+      })
     }
   }
 }
