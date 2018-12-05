@@ -107,7 +107,6 @@ export default {
       var zoom = this.map.getZoom()
       var bbox = this.map.getBounds().toBBoxString()
       var operator = this.$store.state.selectedOperator.id ? this.$store.state.selectedOperator.id : null
-      console.log(this.$store.state.selectedOperator)
       var baseURL = this.clusterURL.replace(/\{\{zoom\}\}/, zoom).replace(/\{\{bbox\}\}/, bbox).replace(/\{\{operator\}\}/, operator)
       this.fetchClusters(baseURL, this.map.fetchID)
     },
@@ -118,15 +117,6 @@ export default {
           context.map.removeLayer(layer)
         }
       })
-    },
-    async continueFetch(new_url, id) {
-      var map = this.map
-      var context = this
-      if (new_url) {
-        context.fetchClusters(new_url, id)
-      } else {
-        map.addLayer(map.markerClusterGroup)
-      }
     },
     async fetchClusters (url, id) {
       // After changing pan/zoom, stop fetching from previous screen
@@ -142,7 +132,15 @@ export default {
         })
         var data = response.data
         // Try next page of API
-        var promise = continueFetch(data.next, id)
+        var promise = new Promise(function (resolve) {
+          var new_url = data.next
+          if (new_url) {
+            resolve(context.fetchClusters(new_url, id))
+          } else {
+            map.addLayer(map.markerClusterGroup)
+            resolve()
+          }
+        })
         // Iterate over every feature and add to map
         var layer = L.featureGroup.subGroup(map.markerClusterGroup)
         L.geoJson(data, {
