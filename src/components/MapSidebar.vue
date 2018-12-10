@@ -167,9 +167,9 @@ export default {
           break
       }
     },
-    operatorsToOptions() {
-      return this.$store.state.operators.map(function(operator) {
-        var newOperator = {toString: function() { return operator.friendly_name }}
+    operatorsToOptions () {
+      return this.$store.state.operators.map(function (operator) {
+        var newOperator = { toString: function () { return operator.friendly_name } }
         for (var key in operator) {
           newOperator[key] = operator[key]
         }

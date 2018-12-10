@@ -8,9 +8,19 @@
 </template>
 
 <script>
+import L from 'leaflet'
+import 'leaflet.markercluster'
+import 'leaflet.featuregroup.subgroup'
+import 'leaflet-draw'
 import MapSidebar from '@/components/MapSidebar'
 import { HTTP } from '@/api/api.js'
 
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+})
 export default {
   components: {
     MapSidebar
@@ -31,23 +41,34 @@ export default {
   async mounted () {
     this.map = L.map('map')
 
-    this.drawnItems = new L.FeatureGroup();
-    this.map.addLayer(this.drawnItems);
+    this.drawnItems = new L.FeatureGroup()
+    this.map.addLayer(this.drawnItems)
     this.drawControl = new L.Control.Draw({
       edit: {
         featureGroup: this.drawnItems
       }
-    });
+    })
 
     this.map.setMaxZoom(19)
-    this.map.fetchID = 0  
-    await this.initMap()
+    this.map.fetchID = 0
+    try {
+      await this.initMap()
+    } catch (err) {
+      console.log(err)
+      return
+    }
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map)
 
-    this.map.on('moveend', this.moveendHandler)
+    let map = this.map
+    map.on('moveend', this.moveendHandler)
+    map.locate().on('locationfound', function (e) {
+      map.setView([e.latitude, e.longitude], 17)
+    }).on('locationerror', function(e) {
+      map.setView(map.defaultLocation, 17)
+    })
     // var bounds = [[-46.7302, -23.5572], [-46.7202, -23.5472]]
     // var rectangle = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(this.map)
     // rectangle.editing.enable()
@@ -55,25 +76,21 @@ export default {
   },
   methods: {
     async initMap () {
-      try {
-        const response = await HTTP({
-          url: '/api/map_info/',
-          method: 'GET',
-          headers: {
-            'Authorization': 'Token ' + this.$store.state.authToken
-          }
-        })
-        this.defaultLocation = response.data.location
-        this.$store.state.selectedOperator = {}
-        this.map.setView(this.defaultLocation, 17)
-        this.clusterURL = response.data.cluster_url
-        this.operatorURL = response.data.operator_url
-        this.$store.state.operators = [{id: null, friendly_name: ""}]
-        this.$store.state.selectedOperator = this.$store.state.operators[0]
-        this.getOperatorData()
-      } catch (err) {
-        console.log(err)
-      }
+      const response = await HTTP({
+        url: '/api/map_info/',
+        method: 'GET',
+        headers: {
+          'Authorization': 'Token ' + this.$store.state.authToken
+        }
+      })
+      this.map.defaultLocation = response.data.location
+      this.$store.state.selectedOperator = {}
+      // this.map.setView(this.defaultLocation, 17)
+      this.clusterURL = response.data.cluster_url
+      this.operatorURL = response.data.operator_url
+      this.$store.state.operators = [{ id: null, friendly_name: '' }]
+      this.$store.state.selectedOperator = this.$store.state.operators[0]
+      this.getOperatorData()
     },
     async getOperatorData () {
       try {
@@ -85,10 +102,10 @@ export default {
           }
         })
         var fetchedOperators = response.data
-        fetchedOperators.sort(function(a, b) {
-          if (a.friendly_name > b.friendly_name) return 1;
-          if (a.friendly_name < b.friendly_name) return -1;
-          return 0;
+        fetchedOperators.sort(function (a, b) {
+          if (a.friendly_name > b.friendly_name) return 1
+          if (a.friendly_name < b.friendly_name) return -1
+          return 0
         })
         this.$store.state.operators = this.$store.state.operators.concat(fetchedOperators)
       } catch (err) {
@@ -113,7 +130,7 @@ export default {
     clearMarkerLayers () {
       var context = this
       this.map.eachLayer(function (layer) {
-        if (layer.removeOnPan && layer.fetchID != context.map.fetchID) {
+        if (layer.removeOnPan && layer.fetchID !== context.map.fetchID) {
           context.map.removeLayer(layer)
         }
       })
@@ -122,7 +139,7 @@ export default {
       // After changing pan/zoom, stop fetching from previous screen
       var map = this.map
       var context = this
-      if (this.map.fetchID == id) {
+      if (this.map.fetchID === id) {
         const response = await HTTP({
           url: url,
           method: 'GET',
@@ -133,9 +150,9 @@ export default {
         var data = response.data
         // Try next page of API
         var promise = new Promise(function (resolve) {
-          var new_url = data.next
-          if (new_url) {
-            resolve(context.fetchClusters(new_url, id))
+          var newUrl = data.next
+          if (newUrl) {
+            resolve(context.fetchClusters(newUrl, id))
           } else {
             map.addLayer(map.markerClusterGroup)
             resolve()
@@ -148,7 +165,7 @@ export default {
             var props = feature.properties
             marker.count = props.count
             // If it is not a cluster, add text data to marker
-            if (props.count == 1) {
+            if (props.count === 1) {
               marker.bindTooltip(`${props.data}`)
             } else {
               marker.setIcon(context.iconCreateFunction(marker))
@@ -161,7 +178,7 @@ export default {
         layer.removeOnPan = true
         layer.fetchID = id
         context.clearMarkerLayers()
-        if (id == context.map.fetchID) {
+        if (id === context.map.fetchID) {
           context.map.addLayer(layer)
         }
         return promise
@@ -181,7 +198,7 @@ export default {
       } else if (cluster.count) { // custom call
         count = cluster.count
       }
-      if (count == 1) { // actual marker
+      if (count === 1) { // actual marker
         return new L.Icon.Default()
       }
       // cluster icon
@@ -235,13 +252,21 @@ export default {
       console.log(e)
       var type = e.layerType
       var layer = e.layer
-      alert(layer.getLatLng() + "\nRadio:" + layer.getRadius())
+      alert(layer.getLatLng() + '\nRadio:' + layer.getRadius())
       this.drawnItems.addLayer(layer)
-    },
+    }
   }
 }
 
 </script>
 <style>
-#map {height: 1000px; z-index: 0}
+@import "../../node_modules/leaflet/dist/leaflet.css";
+@import "../../node_modules/leaflet.markercluster/dist/MarkerCluster.css";
+@import "../../node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css";
+@import "../../node_modules/leaflet-draw/dist/leaflet.draw.css";
+
+#map {
+  height: 1000px;
+  z-index: 0;
+}
 </style>
