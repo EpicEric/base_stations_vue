@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Header />
     <MapSidebar @selectRectangle="selectRectangle" @selectCircle="selectCircle" ></MapSidebar>
     <v-content>
         <div id="map"></div>
@@ -12,6 +13,7 @@ import L from 'leaflet'
 import 'leaflet.markercluster'
 import 'leaflet.featuregroup.subgroup'
 import 'leaflet-draw'
+import Header from '@/components/Header'
 import MapSidebar from '@/components/MapSidebar'
 import { HTTP } from '@/api/api.js'
 
@@ -23,6 +25,7 @@ L.Icon.Default.mergeOptions({
 })
 export default {
   components: {
+    Header,
     MapSidebar
   },
   data () {
@@ -66,7 +69,7 @@ export default {
     map.on('moveend', this.moveendHandler)
     map.locate().on('locationfound', function (e) {
       map.setView([e.latitude, e.longitude], 17)
-    }).on('locationerror', function(e) {
+    }).on('locationerror', function (e) {
       map.setView(map.defaultLocation, 17)
     })
     // var bounds = [[-46.7302, -23.5572], [-46.7202, -23.5472]]
@@ -238,7 +241,7 @@ export default {
       this.map.on('draw:created', this.handleSelectRectangle)
     },
     handleSelectRectangle (e) {
-      var type = e.layerType
+      // var type = e.layerType
       var layer = e.layer
       alert(layer.getLatLngs())
       this.drawnItems.addLayer(layer)
@@ -250,7 +253,7 @@ export default {
     },
     handleSelectCircle (e) {
       console.log(e)
-      var type = e.layerType
+      // var type = e.layerType
       var layer = e.layer
       alert(layer.getLatLng() + '\nRadio:' + layer.getRadius())
       this.drawnItems.addLayer(layer)

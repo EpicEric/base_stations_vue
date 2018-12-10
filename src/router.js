@@ -25,8 +25,8 @@ export default new Router({
       component: Signup
     },
     {
-      path: '/mapa',
-      name: 'mapa',
+      path: '/map',
+      name: 'map',
       component: MapView
     }
   ]
