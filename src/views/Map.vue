@@ -3,7 +3,7 @@
     <Header />
     <MapSidebar @selectRectangle="selectRectangle" @selectCircle="selectCircle" ></MapSidebar>
     <v-content>
-        <div id="map"></div>
+        <div id="map" v-bind:style="mapStyle"></div>
     </v-content>
   </div>
 </template>
@@ -33,7 +33,11 @@ export default {
       map: null,
       clusterURL: null,
       drawControl: null,
-      drawnItems: null
+      drawnItems: null,
+      mapStyle: {
+        height: '100vh',
+        'z-index': 0
+      }
     }
   },
   beforeCreate () {
@@ -43,6 +47,9 @@ export default {
   },
   async mounted () {
     this.map = L.map('map')
+
+    window.addEventListener('resize', this.handleResize)
+    this.handleResize(null)
 
     this.drawnItems = new L.FeatureGroup()
     this.map.addLayer(this.drawnItems)
@@ -129,6 +136,11 @@ export default {
       var operator = this.$store.state.selectedOperator.id ? this.$store.state.selectedOperator.id : null
       var baseURL = this.clusterURL.replace(/\{\{zoom\}\}/, zoom).replace(/\{\{bbox\}\}/, bbox).replace(/\{\{operator\}\}/, operator)
       this.fetchClusters(baseURL, this.map.fetchID)
+    },
+    handleResize (event) {
+      let header = document.getElementById('map-header')
+      this.$set(this.mapStyle, 'height', `calc(100vh - ${header.clientHeight}px)`)
+      console.log(this.mapStyle.height)
     },
     clearMarkerLayers () {
       var context = this
@@ -260,16 +272,10 @@ export default {
     }
   }
 }
-
 </script>
 <style>
 @import "../../node_modules/leaflet/dist/leaflet.css";
 @import "../../node_modules/leaflet.markercluster/dist/MarkerCluster.css";
 @import "../../node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css";
 @import "../../node_modules/leaflet-draw/dist/leaflet.draw.css";
-
-#map {
-  height: 1000px;
-  z-index: 0;
-}
 </style>
