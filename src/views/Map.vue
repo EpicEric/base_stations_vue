@@ -69,7 +69,9 @@ export default {
     }
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxNativeZoom: 19,
+      maxZoom: 19
     }).addTo(this.map)
 
     let map = this.map
@@ -140,7 +142,6 @@ export default {
     handleResize (event) {
       let header = document.getElementById('map-header')
       this.$set(this.mapStyle, 'height', `calc(100vh - ${header.clientHeight}px)`)
-      console.log(this.mapStyle.height)
     },
     clearMarkerLayers () {
       var context = this
@@ -264,7 +265,6 @@ export default {
       this.map.on('draw:created', this.handleSelectCircle)
     },
     handleSelectCircle (e) {
-      console.log(e)
       // var type = e.layerType
       var layer = e.layer
       alert(layer.getLatLng() + '\nRadio:' + layer.getRadius())
