@@ -68,8 +68,8 @@ export default {
       return
     }
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}@2x.png', {
+      attribution: '&copy; <a href="https://carto.com">Carto</a> (CC BY 3.0), <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> (ODbL)',
       maxNativeZoom: 19,
       maxZoom: 19
     }).addTo(this.map)
@@ -81,10 +81,6 @@ export default {
     }).on('locationerror', function (e) {
       map.setView(map.defaultLocation, 17)
     })
-    // var bounds = [[-46.7302, -23.5572], [-46.7202, -23.5472]]
-    // var rectangle = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(this.map)
-    // rectangle.editing.enable()
-    // this.map.fitBounds(bounds)
   },
   methods: {
     async initMap () {
