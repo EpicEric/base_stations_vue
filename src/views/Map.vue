@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header />
-    <MapSidebar @selectRectangle="selectRectangle" @selectCircle="selectCircle" ></MapSidebar>
+    <MapSidebar @changeOperator="moveendHandler" @selectRectangle="selectRectangle" @selectCircle="selectCircle" ></MapSidebar>
     <v-content>
         <div id="map" v-bind:style="mapStyle"></div>
     </v-content>
