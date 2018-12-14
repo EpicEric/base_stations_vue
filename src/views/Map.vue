@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Header />
-    <MapSidebar @changeOperator="moveendHandler" @selectRectangle="selectRectangle" @selectCircle="selectCircle" ></MapSidebar>
+    <Header ref="header" @toggleSidebar="toggleSidebar" />
+    <MapSidebar ref="sidebar" @changeOperator="moveendHandler" @selectRectangle="selectRectangle" @selectCircle="selectCircle" />
     <v-content>
         <div id="map" v-bind:style="mapStyle"></div>
     </v-content>
@@ -145,7 +145,9 @@ export default {
       const self = this
       setTimeout(function () {
         let header = document.getElementById('map-header')
-        self.mapStyle.height = `calc(100vh - ${header.clientHeight}px)`
+        if (header) {
+          self.mapStyle.height = `calc(100vh - ${header.clientHeight}px)`
+        }
       }, 200)
     },
     clearMarkerLayers () {
@@ -264,7 +266,9 @@ export default {
       alert(layer.getLatLngs())
       this.drawnItems.addLayer(layer)
     },
-
+    toggleSidebar () {
+      this.$refs.sidebar.toggleSidebar()
+    },
     selectCircle () {
       new L.Draw.Circle(this.map, this.drawControl.options.circle).enable()
       this.map.on('draw:created', this.handleSelectCircle)

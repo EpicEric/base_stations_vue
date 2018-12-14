@@ -2,7 +2,8 @@
     <v-navigation-drawer dark
       fixed
       clipped
-      app>
+      app
+      v-model="drawer">
       <v-list>
         <v-list-group
           prepend-icon="visibility">
@@ -60,6 +61,7 @@
 export default {
   data () {
     return {
+      drawer: true,
       showOptions: { 'operator': false },
       items: [
         {
@@ -90,6 +92,10 @@ export default {
     },
     operatorChange (newOperator) {
       this.$emit('changeOperator')
+    },
+    toggleSidebar () {
+      console.log('toggle from drawer')
+      this.drawer = !this.drawer
     }
   }
 }

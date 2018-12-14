@@ -27,7 +27,9 @@ export default new Vuex.Store({
         })
         commit('setAuthToken', response.data.token)
       } catch (err) {
-        console.log(err)
+        if (!/status code 400/.test(err)) {
+          console.log(err)
+        }
       }
     }
   }
