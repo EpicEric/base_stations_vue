@@ -71,7 +71,7 @@ export default {
     }
 
     L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}@2x.png', {
-      attribution: '&copy; <a href="https://carto.com">Carto</a> (CC BY 3.0), <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> (ODbL)',
+      attribution: '&copy; <a href="https://carto.com/attribution/">Carto</a> (CC BY 3.0), <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> (ODbL)',
       maxNativeZoom: 19,
       maxZoom: 19
     }).addTo(this.map)
