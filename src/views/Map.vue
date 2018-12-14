@@ -64,7 +64,9 @@ export default {
     try {
       await this.initMap()
     } catch (err) {
-      console.log(err)
+      if (!/status code 401/.test(err)) {
+        console.log(err)
+      }
       return
     }
 
@@ -122,6 +124,7 @@ export default {
     },
     moveendHandler (e) {
       this.map.fetchID = (this.map.fetchID % 9007199254740991) + 1
+      const fetchID = this.map.fetchID
       this.clearMarkerLayers()
       this.map.markerClusterGroup = L.markerClusterGroup({
         showCoverageOnHover: false,
@@ -133,11 +136,17 @@ export default {
       var bbox = this.map.getBounds().toBBoxString()
       var operator = this.$store.state.selectedOperator.id ? this.$store.state.selectedOperator.id : null
       var baseURL = this.clusterURL.replace(/\{\{zoom\}\}/, zoom).replace(/\{\{bbox\}\}/, bbox).replace(/\{\{operator\}\}/, operator)
-      this.fetchClusters(baseURL, this.map.fetchID)
+      const self = this
+      setTimeout(function () {
+        self.fetchClusters(baseURL, fetchID)
+      }, 500)
     },
     handleResize (event) {
-      let header = document.getElementById('map-header')
-      this.$set(this.mapStyle, 'height', `calc(100vh - ${header.clientHeight}px)`)
+      const self = this
+      setTimeout(function () {
+        let header = document.getElementById('map-header')
+        self.mapStyle.height = `calc(100vh - ${header.clientHeight}px)`
+      }, 200)
     },
     clearMarkerLayers () {
       var context = this

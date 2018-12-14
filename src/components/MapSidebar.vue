@@ -2,9 +2,7 @@
     <v-navigation-drawer dark
       fixed
       clipped
-      app
-      v-model="drawer"
-    >
+      app>
       <v-list>
         <v-list-group
           prepend-icon="visibility">
@@ -91,7 +89,6 @@ export default {
       })
     },
     operatorChange (newOperator) {
-      // console.log(operator.toString())
       this.$emit('changeOperator')
     }
   }
