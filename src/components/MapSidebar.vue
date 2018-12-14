@@ -3,7 +3,8 @@
       fixed
       clipped
       app
-      v-model="drawer">
+      v-model="drawer"
+      ref="drawer">
       <v-list>
         <v-list-group
           prepend-icon="visibility">
@@ -94,8 +95,12 @@ export default {
       this.$emit('changeOperator')
     },
     toggleSidebar () {
-      console.log('toggle from drawer')
-      this.drawer = !this.drawer
+      if (this.sidebarIsMobile()) {
+        this.drawer = !this.drawer
+      }
+    },
+    sidebarIsMobile () {
+      return /v-navigation-drawer--is-mobile/.test(this.$refs.drawer.$el.className)
     }
   }
 }
