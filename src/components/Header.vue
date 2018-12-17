@@ -8,7 +8,7 @@
 export default {
   data () {
     return {
-      title: 'Mapa de ERBs'
+      title: 'Nimbus – Mapa de ERBs'
     }
   },
   methods: {

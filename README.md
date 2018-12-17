@@ -1,10 +1,16 @@
 # base_stations_vue
 
-# Install dependencies
+## Install dependencies
+```
 npm install
+```
 
-# Starts a dev server
+## Start a dev server
+```
 npm run serve
+```
 
-# Build for production
+## Build for production
+```
 npm run build
+```

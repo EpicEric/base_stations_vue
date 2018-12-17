@@ -41,7 +41,7 @@
               <h1 class="m-0">
                 <a href="#">
                   <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                    <title>Sistema de Instalação de ERBs</title>
+                    <title>Nimbus &ndash; Instalação de ERBs</title>
                     <defs>
                       <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="logo-a">
                         <stop stop-color="#FFF" stop-opacity=".48" offset="0%"/>
@@ -101,10 +101,10 @@
           </div>
           <div class="container-sm">
             <div class="hero-inner">
-              <h1 class="hero-title mt-0 is-revealing">Sistema de Instalação de ERBs</h1>
+              <h1 class="hero-title mt-0 is-revealing">Nimbus</h1>
               <p class="hero-paragraph is-revealing">A ferramenta mais inovadora no mercado de telecomunicações para a instalação de antenas celulares.</p>
               <div class="hero-cta is-revealing">
-                <router-link class="button button-primary button-shadow" to="map">Acessar sistema</router-link>
+                <router-link class="button button-primary button-shadow" to="map">Acessar o Nimbus</router-link>
               </div>
               <div class="hero-browser">
                 <svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
@@ -187,7 +187,7 @@
                       </svg>
                     </div>
                     <h3 class="feature-title mt-24">Interface limpa e simples</h3>
-                    <p class="text-sm">Baseado em conceitos de Material Design e User Experience, o sistema possui telas extremamente intuitivas para novos usuários.</p>
+                    <p class="text-sm">Baseado em conceitos de Material Design e User Experience, o Nimbus possui telas extremamente intuitivas para novos usuários.</p>
                   </div>
                 </div>
               </div>
@@ -243,7 +243,7 @@
             <div class="cta-inner section-inner">
               <div class="cta-content text-center">
                 <h2 class="section-title mt-0">Fique por dentro</h2>
-                <p class="section-paragraph">Ainda temos um longo caminho pela frente. Queremos ter pessoas engajadas para garantir o futuro da área de telecomunicação.</p>
+                <p class="section-paragraph">Ainda temos um longo caminho pela frente. Queremos ter pessoas engajadas para garantir o futuro da área de telecomunicação. Envie um e-mail para o Nimbus!</p>
                 <div class="section-cta">
                   <a class="button button-primary button-shadow" href="mailto:contato@ericpires.com.br">Entre em contato</a>
                 </div>
@@ -292,7 +292,7 @@
             <div class="brand footer-brand">
               <a href="#">
                 <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                  <title>Sistema de Instalação de ERBs</title>
+                  <title>Nimbus &ndash; Instalação de ERBs</title>
                   <defs>
                     <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="logo-footer-a">
                       <stop stop-color="#FFF" stop-opacity=".48" offset="0%"/>
