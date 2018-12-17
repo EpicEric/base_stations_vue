@@ -3,11 +3,11 @@
     <Header ref="header" @toggleSidebar="toggleSidebar" />
     <MapSidebar ref="sidebar" @changeOperator="moveendHandler" @selectRectangle="selectRectangle" @selectCircle="selectCircle" />
     <v-content>
-        <loading
-          :active.sync="isLoading"
-          :is-full-page="false" >
-        </loading>
-        <div id="map" v-bind:style="mapStyle" />
+      <loading :active.sync="isLoading"
+                :is-full-page="false" >
+        <grid-loader :color="'#2B0FC4'" :size="'20px'" />
+      </loading>
+      <div id="map" v-bind:style="mapStyle" />
     </v-content>
   </div>
 </template>
@@ -18,6 +18,7 @@ import 'leaflet.markercluster'
 import 'leaflet.featuregroup.subgroup'
 import 'leaflet-draw'
 import Loading from 'vue-loading-overlay'
+import GridLoader from 'vue-spinner/src/GridLoader.vue'
 import Header from '@/components/Header'
 import MapSidebar from '@/components/MapSidebar'
 import { HTTP } from '@/api/api.js'
@@ -38,7 +39,8 @@ export default {
   components: {
     Header,
     MapSidebar,
-    Loading
+    Loading,
+    GridLoader
   },
   data () {
     return {
@@ -136,7 +138,7 @@ export default {
       }
     },
     moveendHandler (e) {
-      const self = this
+      const context = this
       const map = this.map
       map.fetchID = (this.map.fetchID % 9007199254740991) + 1
       const fetchID = this.map.fetchID
@@ -152,26 +154,26 @@ export default {
       var operator = this.$store.state.selectedOperator.id ? this.$store.state.selectedOperator.id : null
       var baseURL = this.clusterURL.replace(/\{\{zoom\}\}/, zoom).replace(/\{\{bbox\}\}/, bbox).replace(/\{\{operator\}\}/, operator)
       setTimeout(function () {
-        if (fetchID === self.map.fetchID) {
-          self.isLoading = true
-          self.fetchClusters(baseURL, fetchID).then(() => {
+        if (fetchID === context.map.fetchID) {
+          context.isLoading = true
+          context.fetchClusters(baseURL, fetchID).then(() => {
             map.addLayer(map.markerClusterGroup)
-            self.isLoading = false
+            context.isLoading = false
           })
         }
       }, fetchID === 1 ? 0 : 750)
     },
     handleResize (event) {
-      const self = this
+      const context = this
       setTimeout(function () {
         let header = document.getElementById('map-header')
         if (header) {
-          self.mapStyle.height = `calc(100vh - ${header.clientHeight}px)`
+          context.mapStyle.height = `calc(100vh - ${header.clientHeight}px)`
         }
       }, 200)
     },
     clearMarkerLayers () {
-      var context = this
+      const context = this
       this.map.eachLayer(function (layer) {
         if (layer.removeOnPan && layer.fetchID !== context.map.fetchID) {
           context.map.removeLayer(layer)
