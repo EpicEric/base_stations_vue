@@ -3,7 +3,11 @@
     <Header ref="header" @toggleSidebar="toggleSidebar" />
     <MapSidebar ref="sidebar" @changeOperator="moveendHandler" @selectRectangle="selectRectangle" @selectCircle="selectCircle" />
     <v-content>
-        <div id="map" v-bind:style="mapStyle"></div>
+        <loading
+          :active.sync="isLoading"
+          :is-full-page="false" >
+        </loading>
+        <div id="map" v-bind:style="mapStyle" />
     </v-content>
   </div>
 </template>
@@ -13,9 +17,16 @@ import L from 'leaflet'
 import 'leaflet.markercluster'
 import 'leaflet.featuregroup.subgroup'
 import 'leaflet-draw'
+import Loading from 'vue-loading-overlay'
 import Header from '@/components/Header'
 import MapSidebar from '@/components/MapSidebar'
 import { HTTP } from '@/api/api.js'
+
+import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
+import 'leaflet-draw/dist/leaflet.draw.css'
+import 'vue-loading-overlay/dist/vue-loading.css'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -26,11 +37,13 @@ L.Icon.Default.mergeOptions({
 export default {
   components: {
     Header,
-    MapSidebar
+    MapSidebar,
+    Loading
   },
   data () {
     return {
       map: null,
+      isLoading: false,
       clusterURL: null,
       drawControl: null,
       drawnItems: null,
@@ -123,23 +136,30 @@ export default {
       }
     },
     moveendHandler (e) {
-      this.map.fetchID = (this.map.fetchID % 9007199254740991) + 1
+      const self = this
+      const map = this.map
+      map.fetchID = (this.map.fetchID % 9007199254740991) + 1
       const fetchID = this.map.fetchID
       this.clearMarkerLayers()
-      this.map.markerClusterGroup = L.markerClusterGroup({
+      map.markerClusterGroup = L.markerClusterGroup({
         showCoverageOnHover: false,
         iconCreateFunction: this.iconCreateFunction
       })
-      this.map.markerClusterGroup.removeOnPan = true
-      this.map.markerClusterGroup.fetchID = this.map.fetchID
-      var zoom = this.map.getZoom()
-      var bbox = this.map.getBounds().toBBoxString()
+      map.markerClusterGroup.removeOnPan = true
+      map.markerClusterGroup.fetchID = map.fetchID
+      var zoom = map.getZoom()
+      var bbox = map.getBounds().toBBoxString()
       var operator = this.$store.state.selectedOperator.id ? this.$store.state.selectedOperator.id : null
       var baseURL = this.clusterURL.replace(/\{\{zoom\}\}/, zoom).replace(/\{\{bbox\}\}/, bbox).replace(/\{\{operator\}\}/, operator)
-      const self = this
       setTimeout(function () {
-        self.fetchClusters(baseURL, fetchID)
-      }, 500)
+        if (fetchID === self.map.fetchID) {
+          self.isLoading = true
+          self.fetchClusters(baseURL, fetchID).then(() => {
+            map.addLayer(map.markerClusterGroup)
+            self.isLoading = false
+          })
+        }
+      }, fetchID === 1 ? 0 : 750)
     },
     handleResize (event) {
       const self = this
@@ -160,8 +180,8 @@ export default {
     },
     async fetchClusters (url, id) {
       // After changing pan/zoom, stop fetching from previous screen
-      var map = this.map
-      var context = this
+      const map = this.map
+      const context = this
       if (this.map.fetchID === id) {
         const response = await HTTP({
           url: url,
@@ -177,7 +197,6 @@ export default {
           if (newUrl) {
             resolve(context.fetchClusters(newUrl, id))
           } else {
-            map.addLayer(map.markerClusterGroup)
             resolve()
           }
         })
@@ -282,9 +301,3 @@ export default {
   }
 }
 </script>
-<style>
-@import "../../node_modules/leaflet/dist/leaflet.css";
-@import "../../node_modules/leaflet.markercluster/dist/MarkerCluster.css";
-@import "../../node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css";
-@import "../../node_modules/leaflet-draw/dist/leaflet.draw.css";
-</style>
