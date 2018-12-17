@@ -6,6 +6,15 @@
       v-model="drawer"
       ref="drawer">
       <v-list>
+        <v-list-tile class="close-button-tile"
+                     @click="toggleSidebar">
+          <v-list-tile-action>
+            <v-icon>close</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Esconder menu</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
         <v-list-group
           prepend-icon="visibility">
             <v-list-tile slot="activator">
@@ -105,3 +114,11 @@ export default {
   }
 }
 </script>
+<style>
+.close-button-tile {
+  display: none;
+}
+.v-navigation-drawer--is-mobile .close-button-tile {
+  display: block;
+}
+</style>
