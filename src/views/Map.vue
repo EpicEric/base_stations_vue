@@ -5,7 +5,7 @@
     <v-content>
       <loading :active.sync="isLoading"
                 :is-full-page="false" >
-        <grid-loader :color="'#2B0FC4'" :size="'20px'" />
+        <grid-loader :color="'#424242'" :size="'20px'" />
       </loading>
       <div id="map" v-bind:style="mapStyle" />
     </v-content>
