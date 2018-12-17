@@ -17,7 +17,8 @@ import {
   VSubheader,
   VExpansionPanel,
   VSelect,
-  VRadioGroup
+  VRadioGroup,
+  VInput
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
 
@@ -39,6 +40,7 @@ Vue.use(Vuetify, {
     VSubheader,
     VExpansionPanel,
     VSelect,
-    VRadioGroup
+    VRadioGroup,
+    VInput
   }
 })

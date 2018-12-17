@@ -51,16 +51,13 @@
               </v-list-tile-content>
             </v-list-tile>
 
-            <v-list-tile
-              v-for="subItem in item.items"
-              :key="subItem.title">
-              <v-list-tile-content>
-                <v-list-tile-title>{{ subItem.title }}</v-list-tile-title>
-              </v-list-tile-content>
-
-              <v-list-tile-action>
-                <v-icon>{{ subItem.action }}</v-icon>
-              </v-list-tile-action>
+            <v-list-tile>
+            
+            <v-flex xs8>Número de antenas</v-flex>
+            <v-flex xs4> <input v-model="numberErbs" type="number" min="1" max="5" value="1" /> </v-flex>
+            </v-list-tile>
+            <v-list-tile>
+              <v-btn class="ml-0" color="primary" @click="$emit('selectRectangle', numberErbs)">Calcular</v-btn>
             </v-list-tile>
           </v-list-group>
         </v-list>
@@ -72,6 +69,7 @@ export default {
   data () {
     return {
       drawer: true,
+      numberErbs: "1",
       showOptions: { 'operator': false },
       items: [
         {

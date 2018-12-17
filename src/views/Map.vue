@@ -52,7 +52,10 @@ export default {
       mapStyle: {
         height: '100vh',
         'z-index': 0
-      }
+      },
+      markers: [],
+      rectangle: {},
+      numberErbs: 1
     }
   },
   beforeCreate () {
@@ -277,15 +280,50 @@ export default {
       }
       return (Math.round(count * 100) / 100) + suffix[suffixIndex]
     },
-    selectRectangle () {
+    selectRectangle (numberErbs) {
+      this.numberErbs = numberErbs
       new L.Draw.Rectangle(this.map, this.drawControl.options.rectangle).enable()
       this.map.on('draw:created', this.handleSelectRectangle)
     },
-    handleSelectRectangle (e) {
+    async handleSelectRectangle (e) {
       // var type = e.layerType
-      var layer = e.layer
-      alert(layer.getLatLngs())
-      this.drawnItems.addLayer(layer)
+      if(Object.keys(this.rectangle).length != 0) {
+        this.drawnItems.removeLayer(this.rectangle)
+      }
+      this.rectangle = e.layer
+      this.drawnItems.addLayer(this.rectangle)
+
+      const min_lat = this.rectangle.getLatLngs()[0][0].lat
+      const max_lat = this.rectangle.getLatLngs()[0][1].lat
+      const min_long = this.rectangle.getLatLngs()[0][0].lng
+      const max_long = this.rectangle.getLatLngs()[0][2].lng
+
+      const response = await HTTP({
+        url: '/api/optimization/?number_erbs='+this.numberErbs+'&min_lat='+min_lat+'&max_lat='+max_lat+'&min_long='+min_long+'&max_long='+max_long,
+        method: 'GET',
+        headers: {
+          'Authorization': 'Token ' + this.$store.state.authToken
+        }
+      })
+      const redIcon = new L.Icon({
+        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      })
+      const suggestions = response.data.suggestions
+
+      if (this.markers.length != 0) {
+        for(var i = 0; i < this.markers.length; i++) {
+          this.map.removeLayer(this.markers[i])
+        }
+      }
+      for(var i = 0; i < suggestions.length; i++) {
+        this.markers.push(L.marker([suggestions[i][0], suggestions[i][1]], {icon: redIcon}))
+        this.map.addLayer(this.markers[this.markers.length-1])
+      }
     },
     toggleSidebar () {
       this.$refs.sidebar.toggleSidebar()
