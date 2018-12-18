@@ -107,7 +107,8 @@
                 <router-link class="button button-primary button-shadow" to="map">Acessar o Nimbus</router-link>
               </div>
               <div class="hero-browser">
-                <svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                <img width="800" src="../assets/screen.png">
+                <!-- <svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
                   <defs>
                     <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="browser-a">
                       <stop stop-color="#474452" offset="0%"/>
@@ -132,7 +133,7 @@
                     <path fill="#5D5B6E" d="M756 14h24v4h-24z"/>
                     <path fill="url(#browser-c)" d="M47 32h706v2H47z"/>
                   </g>
-                </svg>
+                </svg> -->
               </div>
             </div>
           </div>
