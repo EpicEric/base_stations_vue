@@ -3,6 +3,7 @@
       fixed
       clipped
       app
+      touchless
       v-model="drawer"
       ref="drawer">
       <v-list>
@@ -57,7 +58,7 @@
             <v-flex xs4> <input v-model="numberErbs" type="number" min="1" max="5" value="1" /> </v-flex>
             </v-list-tile>
             <v-list-tile>
-              <v-btn class="ml-0" color="primary" @click="$emit('selectRectangle', numberErbs)">Calcular</v-btn>
+              <v-btn class="ml-0" color="primary" @click="beginOptimization">Calcular</v-btn>
             </v-list-tile>
           </v-list-group>
         </v-list>
@@ -108,6 +109,12 @@ export default {
     },
     sidebarIsMobile () {
       return /v-navigation-drawer--is-mobile/.test(this.$refs.drawer.$el.className)
+    },
+    beginOptimization () {
+      if (this.sidebarIsMobile()) {
+        this.drawer = false
+      }
+      this.$emit('selectRectangle', this.numberErbs)
     }
   }
 }
