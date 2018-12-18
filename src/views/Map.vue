@@ -1,5 +1,35 @@
 <template>
   <div>
+  <v-dialog
+      v-model="dialog"
+      width="500"
+    >
+      <v-card>
+        <v-card-title
+          class="headline grey lighten-2"
+          primary-title
+        >
+          Mensagem
+        </v-card-title>
+
+        <v-card-text>
+          {{message}}
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            flat
+            @click="dialog = false"
+          >
+            OK
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <Header ref="header" @toggleSidebar="toggleSidebar" />
     <MapSidebar ref="sidebar" @changeOperator="moveendHandler" @selectRectangle="selectRectangle" @selectCircle="selectCircle" />
     <v-content>
@@ -56,6 +86,8 @@ export default {
       clusterURL: null,
       drawControl: null,
       drawnItems: null,
+      dialog: false,
+      message: "",
       mapStyle: {
         height: '100vh',
         'z-index': 0
@@ -323,7 +355,10 @@ export default {
         shadowSize: [41, 41]
       })
       const suggestions = response.data.suggestions
-
+      if ('message' in response.data) {
+        this.message = response.data.message
+        this.dialog = true
+      }
       if (this.markers.length != 0) {
         for(var i = 0; i < this.markers.length; i++) {
           this.map.removeLayer(this.markers[i])
