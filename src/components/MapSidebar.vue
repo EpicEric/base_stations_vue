@@ -52,7 +52,7 @@
             </v-list-tile>
 
             <v-list-tile>
-            
+
             <v-flex xs8>Número de antenas</v-flex>
             <v-flex xs4> <input v-model="numberErbs" type="number" min="1" max="5" value="1" /> </v-flex>
             </v-list-tile>
@@ -69,7 +69,7 @@ export default {
   data () {
     return {
       drawer: true,
-      numberErbs: "1",
+      numberErbs: 1,
       showOptions: { 'operator': false },
       items: [
         {

@@ -5,6 +5,10 @@
     <v-content>
       <loading :active.sync="isLoading"
                 :is-full-page="false" >
+        <bounce-loader :color="'#424242'" :size="'60px'" />
+      </loading>
+      <loading :active.sync="isOptimizing"
+                :is-full-page="false" >
         <grid-loader :color="'#424242'" :size="'20px'" />
       </loading>
       <div id="map" v-bind:style="mapStyle" />
@@ -19,6 +23,7 @@ import 'leaflet.featuregroup.subgroup'
 import 'leaflet-draw'
 import Loading from 'vue-loading-overlay'
 import GridLoader from 'vue-spinner/src/GridLoader.vue'
+import BounceLoader from 'vue-spinner/src/BounceLoader.vue'
 import Header from '@/components/Header'
 import MapSidebar from '@/components/MapSidebar'
 import { HTTP } from '@/api/api.js'
@@ -40,12 +45,14 @@ export default {
     Header,
     MapSidebar,
     Loading,
-    GridLoader
+    GridLoader,
+    BounceLoader
   },
   data () {
     return {
       map: null,
-      isLoading: false,
+      isLoading: true,
+      isOptimizing: false,
       clusterURL: null,
       drawControl: null,
       drawnItems: null,
@@ -287,7 +294,7 @@ export default {
     },
     async handleSelectRectangle (e) {
       // var type = e.layerType
-      if(Object.keys(this.rectangle).length != 0) {
+      if (Object.keys(this.rectangle).length != 0) {
         this.drawnItems.removeLayer(this.rectangle)
       }
       this.rectangle = e.layer
@@ -297,6 +304,8 @@ export default {
       const max_lat = this.rectangle.getLatLngs()[0][1].lat
       const min_long = this.rectangle.getLatLngs()[0][0].lng
       const max_long = this.rectangle.getLatLngs()[0][2].lng
+
+      this.isOptimizing = true
 
       const response = await HTTP({
         url: '/api/optimization/?number_erbs='+this.numberErbs+'&min_lat='+min_lat+'&max_lat='+max_lat+'&min_long='+min_long+'&max_long='+max_long,
@@ -320,10 +329,12 @@ export default {
           this.map.removeLayer(this.markers[i])
         }
       }
-      for(var i = 0; i < suggestions.length; i++) {
+      for (var i = 0; i < suggestions.length; i++) {
         this.markers.push(L.marker([suggestions[i][0], suggestions[i][1]], {icon: redIcon}))
         this.map.addLayer(this.markers[this.markers.length-1])
       }
+
+      this.isOptimizing = false
     },
     toggleSidebar () {
       this.$refs.sidebar.toggleSidebar()
