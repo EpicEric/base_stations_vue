@@ -13,21 +13,22 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: Login
-    },
-    {
-      path: '/signup',
-      name: 'signup',
-      component: Signup
-    },
-    {
-      path: '/map',
-      name: 'map',
-      component: MapView
+    // FIXME: Activate/Deactivate back-end
+    // },
+    // {
+    //   path: '/login',
+    //   name: 'login',
+    //   component: Login
+    // },
+    // {
+    //   path: '/signup',
+    //   name: 'signup',
+    //   component: Signup
+    // },
+    // {
+    //   path: '/map',
+    //   name: 'map',
+    //   component: MapView
     }
   ]
 })

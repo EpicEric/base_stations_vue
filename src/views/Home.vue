@@ -103,9 +103,10 @@
             <div class="hero-inner">
               <h1 class="hero-title mt-0 is-revealing">Nimbus</h1>
               <p class="hero-paragraph is-revealing">A ferramenta mais inovadora no mercado de telecomunicações para a instalação de antenas celulares.</p>
-              <div class="hero-cta is-revealing">
+              <!-- FIXME: Activate/Deactivate back-end -->
+              <!-- <div class="hero-cta is-revealing">
                 <router-link class="button button-primary button-shadow" to="map">Acessar o Nimbus</router-link>
-              </div>
+              </div> -->
               <div class="hero-browser">
                 <img width="800" src="../assets/screen.png">
                 <!-- <svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
